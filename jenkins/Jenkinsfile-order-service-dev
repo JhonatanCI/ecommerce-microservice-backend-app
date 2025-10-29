@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+    
+    environment {
+        SERVICE_NAME = "order-service"
+        DOCKER_IMAGE = "tyronemab/${SERVICE_NAME}"
+        DOCKER_TAG = "dev-${BUILD_NUMBER}"
+        MAVEN_OPTS = "-Dmaven.test.skip=false"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/SelimHorri/ecommerce-microservice-backend-app.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                dir("${SERVICE_NAME}") {
+                    sh './mvnw clean package -DskipTests'
+                }
+            }
+        }
+        
+        stage('Docker Build') {
+            steps {
+                dir("${SERVICE_NAME}") {
+                    script {
+                        docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    }
+                }
+            }
+        }
+        
+        stage('Docker Push') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('dev-latest')
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy to Dev') {
+            steps {
+                script {
+                    sh """
+                        kubectl set image deployment/${SERVICE_NAME} ${SERVICE_NAME}=${DOCKER_IMAGE}:${DOCKER_TAG} -n dev
+                        kubectl rollout status deployment/${SERVICE_NAME} -n dev
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "✅ Deployment to DEV successful - ${SERVICE_NAME}"
+        }
+        failure {
+            echo "❌ Deployment to DEV failed - ${SERVICE_NAME}"
+        }
+    }
+}
