@@ -6,6 +6,8 @@ pipeline {
         DOCKER_IMAGE = "tyronemab/${SERVICE_NAME}"
         DOCKER_TAG = "dev-${BUILD_NUMBER}"
         MAVEN_OPTS = "-Dmaven.test.skip=false"
+        JAVA_HOME = "/opt/java-11"
+        PATH = "/opt/java-11/bin:${env.PATH}"
     }
     
     stages {
