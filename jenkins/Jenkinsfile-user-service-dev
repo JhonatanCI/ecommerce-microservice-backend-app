@@ -13,8 +13,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/SelimHorri/ecommerce-microservice-backend-app.git'
+                git branch: 'feature/ci-cd-pipelines',
+                    url: 'https://github.com/JhonatanCI/ecommerce-microservice-backend-app.git'
             }
         }
         
