@@ -31,6 +31,7 @@ pipeline {
                 dir("${SERVICE_NAME}") {
                     sh './mvnw test'
                     junit '**/target/surefire-reports/*.xml'
+                    jacoco execPattern: '**/target/jacoco.exec', classPattern: '**/target/classes', sourcePattern: '**/src/main/java'
                 }
             }
         }
@@ -94,3 +95,4 @@ pipeline {
         }
     }
 }
+
