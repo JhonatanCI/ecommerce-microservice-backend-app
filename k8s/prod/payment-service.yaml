@@ -18,7 +18,7 @@ metadata:
   name: payment-service
   namespace: prod
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: payment-service
@@ -80,7 +80,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: payment-service
-  minReplicas: 3
+  minreplicas: 1
   maxReplicas: 10
   metrics:
   - type: Resource
