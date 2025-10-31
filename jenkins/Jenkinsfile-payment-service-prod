@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     environment {
-        SERVICE_NAME = "user-service"
+        SERVICE_NAME = "payment-service"
         DOCKER_IMAGE = "tyronemab/${SERVICE_NAME}"
-        DOCKER_TAG = "dev-${BUILD_NUMBER}"
+        DOCKER_TAG = "prod-${BUILD_NUMBER}"
         MAVEN_OPTS = "-Dmaven.test.skip=false"
         JAVA_HOME = "/opt/java-11"
         PATH = "/opt/java-11/bin:${env.PATH}"
@@ -58,18 +58,24 @@ pipeline {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                         docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push()
-                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('dev-latest')
+                        docker.image("${DOCKER_IMAGE}:${DOCKER_TAG}").push('prod-latest')
                     }
                 }
             }
         }
         
-        stage('Deploy to Dev') {
+        stage('Approval') {
+            steps {
+                input message: '¿Desplegar a PRODUCCIÓN?', ok: 'Deploy'
+            }
+        }
+        
+        stage('Deploy to Production') {
             steps {
                 script {
                     sh """
-                        kubectl set image deployment/${SERVICE_NAME} ${SERVICE_NAME}=${DOCKER_IMAGE}:${DOCKER_TAG} -n dev
-                        kubectl rollout status deployment/${SERVICE_NAME} -n dev
+                        kubectl set image deployment/${SERVICE_NAME} ${SERVICE_NAME}=${DOCKER_IMAGE}:${DOCKER_TAG} -n prod
+                        kubectl rollout status deployment/${SERVICE_NAME} -n prod
                     """
                 }
             }
@@ -81,10 +87,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "✅ Deployment to DEV successful - ${SERVICE_NAME}"
+            echo "✅ Deployment to PRODUCTION successful - ${SERVICE_NAME}"
         }
         failure {
-            echo "❌ Deployment to DEV failed - ${SERVICE_NAME}"
+            echo "❌ Deployment to PRODUCTION failed - ${SERVICE_NAME}"
         }
     }
 }

@@ -27,8 +27,6 @@ spec:
       labels:
         app: payment-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
       - name: payment-service
         image: tyronemab/payment-service:dev-latest

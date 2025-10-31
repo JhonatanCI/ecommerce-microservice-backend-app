@@ -27,8 +27,6 @@ spec:
       labels:
         app: order-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
       - name: order-service
         image: tyronemab/order-service:dev-latest

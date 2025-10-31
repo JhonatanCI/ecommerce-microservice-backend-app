@@ -27,8 +27,6 @@ spec:
       labels:
         app: user-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
       - name: user-service
         image: tyronemab/user-service:dev-latest

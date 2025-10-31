@@ -27,8 +27,6 @@ spec:
       labels:
         app: shipping-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
       - name: shipping-service
         image: tyronemab/shipping-service:dev-latest

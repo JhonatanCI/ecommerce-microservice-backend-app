@@ -27,8 +27,6 @@ spec:
       labels:
         app: favourite-service
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
       - name: favourite-service
         image: tyronemab/favourite-service:dev-latest
